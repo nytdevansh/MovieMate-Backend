@@ -41,7 +41,8 @@ movie_recommendation/                  <- workspace root
 ├── web/js/frontend-enhance.js         # runtime enhancement for the preserved dashboard
 ├── assets/fallback/poster.svg         # committed fallback image
 ├── assets/posters/ , assets/backdrops/  # optional local image storage (gitignored)
-├── model/                             # installed artifacts (gitignored)
+├── data/all_titles.csv                # compact catalogue committed for deployment
+├── model/                             # six committed deployable artifacts
 ├── reports/generated/                 # generated inspection report
 ├── tests/                             # 41 automated tests
 ├── docs/                              # ARCHITECTURE.md, API.md, PRODUCTION.md
@@ -439,6 +440,24 @@ The TMDB token is read from `Frontend/movie_dataset_builder/.env` (or the enviro
 ---
 
 ## N. Deployment instructions
+
+### Live Render deployment
+
+- App: <https://moviemate-3rui.onrender.com>
+- Backend source: <https://github.com/nytdevansh/MovieMate-Backend>
+- Frontend source: <https://github.com/nytdevansh/MovieMate>
+- Render service: `moviemate` (Web Service, Python, free plan, health check `/api/health`)
+
+The single Render Web Service serves the original `Frontend/` pages, the injected
+UI enhancement scripts, `/api/*` and `/media/*` from one origin, so no CORS or
+cross-origin poster rewriting is needed. `render.yaml` describes the same
+service for infrastructure-as-code setup. The compact combined catalogue is
+committed at `data/all_titles.csv` and the six model artifacts are committed in
+`model/`, so a fresh checkout starts without a training or download step. The
+TMDB bearer token, when configured, is supplied only as a server-side Render
+environment variable.
+
+### Manual / self-hosted
 
 ```bash
 pip install -r requirements.txt gunicorn
