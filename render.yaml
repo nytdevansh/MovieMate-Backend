@@ -27,6 +27,8 @@ services:
         value: IN
       - key: ALLOW_REMOTE_POSTERS
         value: "true"
+      - key: PROXY_REMOTE_IMAGES
+        value: "true"
       - key: MEDIA_CACHE_MAX_AGE
         value: "3600"
       - key: CORS_ALLOWED_ORIGIN

@@ -240,7 +240,7 @@ curl "http://127.0.0.1:5000/api/recommendations/872585?limit=2"
     {
       "movie_id": 999125,
       "title": "Filip",
-      "poster_url": "https://image.tmdb.org/t/p/w500/....jpg",
+      "poster_url": "/media/remote?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw500%2F....jpg",
       "genres": ["Drama", "History", "War"],
       "release_year": 2023,
       "rating": 6.9,
@@ -474,6 +474,7 @@ Most popular titles, tie-broken by vote count then canonical ID.
 |---|---|
 | `GET /media/posters/<id>.<ext>` | Validated local poster; `ext` ∈ `jpg,jpeg,png,webp,gif` |
 | `GET /media/backdrops/<id>.<ext>` | Validated local backdrop |
+| `GET /media/remote?url=<encoded-url>` | First-party proxy for allow-listed TMDB images; avoids client-side network blocking |
 | `GET /media/fallback/poster.svg` | Committed SVG placeholder (the only accepted fallback filename) |
 
 Images are served with correct MIME type, conditional `ETag`/`Last-Modified` support, and `Cache-Control: max-age=<MEDIA_CACHE_MAX_AGE>`. Any other filename or path returns `404 IMAGE_NOT_FOUND`; no arbitrary filesystem path can be requested.
@@ -536,4 +537,4 @@ curl "http://127.0.0.1:5000/api/movies?page=0"
 <script>window.MOVIEMATE_FRONTEND_CONFIG = { apiBaseUrl: "https://api.example.com/api", watchRegion: "IN" };</script>
 ```
 
-The client checks `success`, reads `data` only on success, and surfaces `error.message` in a visible error state. `poster_url` may be a same-origin `/media/...` path, an allowlisted TMDB URL, or `/media/fallback/poster.svg`; all three render identically in an `<img>`.
+The client checks `success`, reads `data` only on success, and surfaces `error.message` in a visible error state. `poster_url` is normally a same-origin `/media/...` path (local image, `/media/remote?url=...` proxy, or `/media/fallback/poster.svg`); all three render identically in an `<img>`. Set `PROXY_REMOTE_IMAGES=false` to emit direct allowlisted TMDB URLs instead.

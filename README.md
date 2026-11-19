@@ -450,7 +450,10 @@ The TMDB token is read from `Frontend/movie_dataset_builder/.env` (or the enviro
 
 The single Render Web Service serves the original `Frontend/` pages, the injected
 UI enhancement scripts, `/api/*` and `/media/*` from one origin, so no CORS or
-cross-origin poster rewriting is needed. `render.yaml` describes the same
+cross-origin poster rewriting is needed. TMDB posters and backdrops are emitted
+as `/media/remote?url=...` and fetched server-side from the allow-listed TMDB
+host, so the images also load on browser networks that block `image.tmdb.org`
+directly. `render.yaml` describes the same
 service for infrastructure-as-code setup. The compact combined catalogue is
 committed at `data/all_titles.csv` and the six model artifacts are committed in
 `model/`, so a fresh checkout starts without a training or download step. The

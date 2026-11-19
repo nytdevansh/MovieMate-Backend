@@ -101,6 +101,13 @@ class Config:
             os.getenv("POSTER_CACHE_TTL_SECONDS", "60")
         )
         self.MEDIA_CACHE_MAX_AGE = _as_int(os.getenv("MEDIA_CACHE_MAX_AGE"), 3600)
+        # Browser-to-TMDB image requests can be blocked by some networks. Serving
+        # validated images through our own origin avoids those client-side
+        # failures; only allow-listed image hosts are ever fetched server-side.
+        self.PROXY_REMOTE_IMAGES = _as_bool(os.getenv("PROXY_REMOTE_IMAGES"), True)
+        self.REMOTE_IMAGE_CACHE_MAX_AGE = _as_int(
+            os.getenv("REMOTE_IMAGE_CACHE_MAX_AGE"), 86400
+        )
 
         self.REQUIRE_MODEL_AT_STARTUP = _as_bool(os.getenv("REQUIRE_MODEL_AT_STARTUP"), True)
         self.DEFAULT_PER_PAGE = _as_int(os.getenv("DEFAULT_PER_PAGE"), 24)

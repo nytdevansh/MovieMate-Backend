@@ -14,10 +14,12 @@ import threading
 import time
 import urllib.request
 import uuid
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 from urllib.error import URLError
+from urllib.parse import quote, urlparse, urlunparse
 
 from ml.preprocessing import normalize_free_text, valid_http_url
 
@@ -33,6 +35,7 @@ _CONTENT_TYPE_SUFFIX = {
     "image/webp": ".webp",
     "image/gif": ".gif",
 }
+_REMOTE_CACHE_MAX_BYTES = 32 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -87,9 +90,16 @@ class PosterService:
         self.auto_download = bool(config.AUTO_DOWNLOAD_POSTERS)
         self.download_timeout = float(config.DOWNLOAD_TIMEOUT_SECONDS)
         self.cache_ttl = float(config.POSTER_CACHE_TTL_SECONDS)
+        self.proxy_remote = bool(getattr(config, "PROXY_REMOTE_IMAGES", True))
+        self.remote_cache_ttl = float(
+            getattr(config, "REMOTE_IMAGE_CACHE_MAX_AGE", 86400)
+        )
         self._cache: dict[tuple[Any, ...], tuple[float, Any]] = {}
         self._locks: dict[tuple[str, int], threading.Lock] = {}
         self._locks_guard = threading.Lock()
+        self._remote_cache: OrderedDict[str, tuple[float, bytes, str]] = OrderedDict()
+        self._remote_cache_bytes = 0
+        self._remote_cache_guard = threading.Lock()
 
     # ------------------------------------------------------------------ public
     def resolve(self, record: Mapping[str, Any]) -> PosterResolution:
@@ -114,7 +124,7 @@ class PosterService:
             poster_url = self._media_url("posters", poster_id, poster_path)
             poster_source = "local"
         else:
-            remote_poster = self._remote_url(record.get("poster_url"))
+            remote_poster = self.public_remote_url(record.get("poster_url"))
             if remote_poster:
                 poster_url, poster_source = remote_poster, "tmdb"
             else:
@@ -127,7 +137,7 @@ class PosterService:
             backdrop_url = self._media_url("backdrops", poster_id, backdrop_path)
             backdrop_source = "local"
         else:
-            remote_backdrop = self._remote_url(record.get("backdrop_url"))
+            remote_backdrop = self.public_remote_url(record.get("backdrop_url"))
             if remote_backdrop:
                 backdrop_url, backdrop_source = remote_backdrop, "tmdb"
 
@@ -191,7 +201,7 @@ class PosterService:
             return existing
         if not force and not self.auto_download:
             return None
-        remote = self._remote_url(url)
+        remote = self._validated_remote_url(url)
         if not remote:
             return None
 
@@ -238,10 +248,77 @@ class PosterService:
     def _dirs(self, kind: str) -> list[Path]:
         return self.poster_dirs if kind == "posters" else self.backdrop_dirs
 
-    def _remote_url(self, value: Any) -> str | None:
+    def _validated_remote_url(self, value: Any) -> str | None:
+        """Return an allow-listed remote image URL, or None."""
         if not self.allow_remote:
             return None
         return valid_http_url(value, self.remote_hosts) or None
+
+    def public_remote_url(self, value: Any) -> str | None:
+        """URL browsers should request: first-party proxy when enabled."""
+        remote = self._validated_remote_url(value)
+        if not remote:
+            return None
+        if not self.proxy_remote:
+            return remote
+        parsed = urlparse(remote)
+        if parsed.scheme == "http":
+            # Always upgrade proxied image URLs; the page itself is HTTPS.
+            remote = urlunparse(parsed._replace(scheme="https"))
+        return "/media/remote?url=" + quote(remote, safe="")
+
+    def fetch_remote_image(self, value: Any) -> tuple[bytes, str]:
+        """Fetch and cache one validated image for the browser-side proxy.
+
+        Only allow-listed hosts are accepted. This prevents the public endpoint
+        from becoming a general-purpose URL fetcher while still letting clients
+        load TMDB images from our own origin when their network blocks TMDB.
+        """
+        remote = self._validated_remote_url(value)
+        if not remote:
+            raise ValueError("Image host is not allowed")
+        parsed = urlparse(remote)
+        if parsed.scheme not in {"http", "https"}:
+            raise ValueError("Unsupported image URL scheme")
+        if parsed.scheme == "http":
+            remote = urlunparse(parsed._replace(scheme="https"))
+
+        now = time.monotonic()
+        with self._remote_cache_guard:
+            cached = self._remote_cache.get(remote)
+            if cached is not None:
+                expires_at, data, content_type = cached
+                if expires_at > now:
+                    self._remote_cache.move_to_end(remote)
+                    return data, content_type
+                self._remote_cache.pop(remote, None)
+                self._remote_cache_bytes -= len(data)
+
+        request = urllib.request.Request(
+            remote, headers={"User-Agent": "MovieMate-ImageProxy/1.0"}
+        )
+        with urllib.request.urlopen(request, timeout=self.download_timeout) as response:
+            content_type = response.headers.get_content_type().strip().lower()
+            if content_type not in _CONTENT_TYPE_SUFFIX:
+                raise ValueError(f"Unsupported image type {content_type!r}")
+            data = response.read(_MAX_IMAGE_BYTES + 1)
+        if not _MIN_IMAGE_BYTES <= len(data) <= _MAX_IMAGE_BYTES or not is_valid_image_bytes(data):
+            raise ValueError("Remote response was not a valid supported image")
+
+        with self._remote_cache_guard:
+            while (
+                self._remote_cache
+                and self._remote_cache_bytes + len(data) > _REMOTE_CACHE_MAX_BYTES
+            ):
+                _, evicted = self._remote_cache.popitem(last=False)
+                self._remote_cache_bytes -= len(evicted[1])
+            self._remote_cache[remote] = (
+                time.monotonic() + max(0.0, self.remote_cache_ttl),
+                data,
+                content_type,
+            )
+            self._remote_cache_bytes += len(data)
+        return data, content_type
 
     @staticmethod
     def _poster_id(record: Mapping[str, Any]) -> str:
