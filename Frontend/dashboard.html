@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netflix UI - Multi-Page Data</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 72px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background-color: #000000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      border-right: 1px solid #1a1a1a;
+    }
+
+    .nav-item {
+      position: relative;
+      color: #808080;
+      cursor: pointer;
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-item:hover { color: #ffffff; transform: scale(1.1); }
+    .nav-item.active { color: #ffffff; }
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      width: 24px;
+      height: 3px;
+      background-color: #e50914;
+      border-radius: 2px;
+    }
+
+    .nav-item svg { width: 22px; height: 22px; stroke-width: 1.75; }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 72px;
+      padding: 40px;
+      width: calc(100% - 72px);
+    }
+
+    /* Hide all pages by default, show only the active one */
+    .page-section {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Sample Card Grid */
+    h1 { font-size: 2rem; margin-bottom: 20px; }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: #181818;
+      border-radius: 6px;
+      padding: 16px;
+      height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      border: 1px solid #2a2a2a;
+    }
+    .search-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px 16px;
+      background: #181818;
+      border: 1px solid #333;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Sidebar with data-target matching each page ID -->
+  <nav class="sidebar">
+    <div class="nav-item" data-target="page-search" title="Search"><i data-lucide="search"></i></div>
+    <div class="nav-item active" data-target="page-home" title="Home"><i data-lucide="home"></i></div>
+    <div class="nav-item" data-target="page-movies" title="Movies"><i data-lucide="clapperboard"></i></div>
+    <div class="nav-item" data-target="page-tv" title="TV Shows"><i data-lucide="tv"></i></div>
+    <div class="nav-item" data-target="page-trending" title="Trending"><i data-lucide="trending-up"></i></div>
+    <div class="nav-item" data-target="page-mylist" title="My List"><i data-lucide="plus"></i></div>
+    <div class="nav-item" data-target="page-shuffle" title="Shuffle"><i data-lucide="shuffle"></i></div>
+  </nav>
+
+  <!-- 2. Content Container: One <section> per icon -->
+  <main class="main-content">
+
+    <section id="page-search" class="page-section">
+      <h1>Search</h1>
+      <input type="text" class="search-input" placeholder="Search movies, TV shows, genres...">
+    </section>
+
+    <section id="page-home" class="page-section active">
+      <img src="images-13.jpeg" alt="" style="width: 1150px;">
+      <p style="color:#aaa; margin-bottom:24px;">IMDb 8.8/10 • 2B+ Streams</p>
+       <h1>Recommended</h1>
+      <div class="card-grid">
+        <div class="card"><img src="781732.jpg" alt=""></div>
+        <div class="card"><img src="835017.jpg" alt=""></div>
+        <div class="card"><img src="857570.jpg" alt=""></div>
+        <div class="card"><img src="875188.jpg" alt=""></div>
+        <div class="card"><img src="904759.jpg" alt=""></div>
+        <div class="card"><img src="960469.jpg" alt=""></div>
+      </div>
+        <h1>Trending</h1>
+        <div class="card-grid">
+        <div class="card"><img src="images-14.jpeg" alt=""></div>
+        <div class="card"><img src="images-15.jpeg" alt=""></div>
+        <div class="card"><img src="images-16.jpeg" alt=""></div>
+        <div class="card"><img src="hail.jpg" alt=""></div>
+        <div class="card"><img src="images-17.jpeg" alt=""></div>
+        <div class="card"><img src="images-18.jpeg" alt=""></div>
+        </div>
+        <h1>Binge Watch</h1>
+        <div class="card-grid">
+            <div class="card"><img src="images-19.jpeg" alt=""></div>
+            <div class="card"><img src="images-20.jpeg" alt=""></div>
+            <div class="card"><img src="images-21.jpeg" alt=""></div>
+            <div class="card"><img src="peakyblinders.jpg" alt=""></div>
+            <div class="card"><img src="images-22.jpeg" alt=""></div>
+            <div class="card"><img src="images-23.jpeg" alt=""></div>
+        </div>
+        <h1>Most Watched</h1>
+        <div class="card-grid">
+            <div class="card"><img src="spiderman.jpg" alt=""></div>
+            <div class="card"><img src="avatar.jpg" alt=""></div>
+            <div class="card"><img src="Coco_(2017_film)_poster.jpg" alt=""></div>
+            <div class="card"><img src="images-24.jpeg" alt=""></div>
+            <div class="card"><img src="Michael_(2026_film_poster).png" alt=""></div>
+            <div class="card"><img src="MV5BMTc0NTUwMTU5OV5BMl5BanBnXkFtZTcwNjAwNzQzMw@@._V1_FMjpg_UX1000_.jpg" alt=""></div>
+        </div>
+    </section>
+
+    <section id="page-movies" class="page-section">
+      <h1>Movies</h1>
+    </section>
+
+    <section id="page-tv" class="page-section">
+      <h1>TV Shows</h1>
+      <div class="card-grid">
+        <div class="card"><img src="/tvshow/images-25.jpeg" alt=""></div>
+        <div class="card"><img src="/tvshow/images-26.jpeg" alt=""></div>
+        <div class="card"><img src="/tvshow/images-28.jpeg" alt=""></div>
+        <div class="card"><img src="/tvshow/images-29.jpeg" alt=""></div>
+        <div class="card"><img src="/tvshow/images-30.jpeg" alt=""></div>
+        <div class="card"><img src="/tvshow/images-31.jpeg" alt=""></div>
+        <div class="card"><img src="/tvshow/MV5BMDQxZGJkNGUtNDdmNS00Mzk4LThlNTAtN2UwNjlhMzYyYjVlXkEyXkFqcGc@._V1_.jpg" alt=""></div>
+        <div class="card"><img src="/tvshow/MV5BMmFkMmJhNzItNzllOS00NjBmLTgyNTgtZjQxZDExZmMyZGU4XkEyXkFqcGc@._V1_.jpg" alt=""></div>
+        <div class="card"><img src="/tvshow/MV5BNTk3OTllYzYtMzUyYi00ZDY5LTk4MDktYzQ3ODdiYmU1YWZmXkEyXkFqcGc@._V1_QL75_UX190_CR0,2,190,281_.jpg" alt=""></div>
+        <div class="card"><img src="/tvshow/MV5BZjgzY2QyNzItNDhhYi00ZWIwLWFjN2UtZDJkN2MxYWNjMmJjXkEyXkFqcGc@._V1_.jpg" alt=""></div>
+        <div class="card"><img src="/tvshow/p26973720_b_v8_aa.jpg" alt=""></div>
+        <div class="card"><img src="/tvshow/p30698252_b_v12_aa.jpg" alt=""></div>
+        </div>
+    </section>
+
+    <section id="page-trending" class="page-section">
+    </section>
+
+    <section id="page-mylist" class="page-section">
+      <h1>My List</h1>
+      <p style="color:#aaa;">Titles you add with the + button will appear here.</p>
+    </section>
+
+    <section id="page-shuffle" class="page-section">
+      <h1>Play Something</h1>
+      <p style="color:#aaa;">Picking a random title for you...</p>
+    </section>
+
+  </main>
+
+  <!-- 3. JavaScript to switch both the active icon and active page -->
+  <script>
+    lucide.createIcons();
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page-section');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // 1. Update active icon
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+
+        // 2. Hide all pages and show the matching target page
+        const targetId = item.getAttribute('data-target');
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

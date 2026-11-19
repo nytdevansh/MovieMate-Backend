@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "feature_fields": [
+    "title",
+    "genres",
+    "overview",
+    "cast",
+    "director",
+    "original_language"
+  ],
+  "feature_weights": {
+    "genres": 3.0,
+    "title": 2.0,
+    "cast": 2.0,
+    "director": 2.0,
+    "original_language": 2.0,
+    "overview": 1.0
+  },
+  "tfidf": {
+    "lowercase": true,
+    "strip_accents": "unicode",
+    "stop_words": null,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 0.95,
+    "max_features": 200000,
+    "sublinear_tf": true,
+    "norm": null
+  },
+  "id_column": "tmdb_id",
+  "default_top_k": 10,
+  "max_top_k": 50,
+  "deduplicate_by_title_year": true
+}

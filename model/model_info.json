@@ -1,0 +1,131 @@
+{
+  "artifact_schema_version": 1,
+  "model_type": "content_based_tfidf_cosine",
+  "n_movies": 6000,
+  "n_titles": 6000,
+  "n_series": 1000,
+  "vocabulary_size": 62219,
+  "feature_dimensions": 373314,
+  "matrix_nnz": 509569,
+  "matrix_density_percent": 0.02275,
+  "training_time_seconds": 3.219,
+  "feature_weights": {
+    "genres": 3.0,
+    "title": 2.0,
+    "cast": 2.0,
+    "director": 2.0,
+    "original_language": 2.0,
+    "overview": 1.0
+  },
+  "dataset_filename": "all_titles.csv",
+  "dataset_profile": {
+    "rows_in": 6000,
+    "rows_out": 6000,
+    "duplicate_tmdb_ids_dropped": 0,
+    "invalid_ids_dropped": 0,
+    "missing_by_column": {
+      "title": {
+        "missing_count": 0,
+        "missing_percent": 0.0
+      },
+      "original_title": {
+        "missing_count": 0,
+        "missing_percent": 0.0
+      },
+      "release_date": {
+        "missing_count": 2,
+        "missing_percent": 0.03
+      },
+      "year": {
+        "missing_count": 2,
+        "missing_percent": 0.03
+      },
+      "original_language": {
+        "missing_count": 0,
+        "missing_percent": 0.0
+      },
+      "genres": {
+        "missing_count": 137,
+        "missing_percent": 2.28
+      },
+      "overview": {
+        "missing_count": 281,
+        "missing_percent": 4.68
+      },
+      "cast": {
+        "missing_count": 190,
+        "missing_percent": 3.17
+      },
+      "director": {
+        "missing_count": 472,
+        "missing_percent": 7.87
+      },
+      "vote_average": {
+        "missing_count": 0,
+        "missing_percent": 0.0
+      },
+      "vote_count": {
+        "missing_count": 0,
+        "missing_percent": 0.0
+      },
+      "popularity": {
+        "missing_count": 0,
+        "missing_percent": 0.0
+      },
+      "poster_url": {
+        "missing_count": 53,
+        "missing_percent": 0.88
+      },
+      "poster_local_path": {
+        "missing_count": 59,
+        "missing_percent": 0.98
+      },
+      "india_streaming": {
+        "missing_count": 4743,
+        "missing_percent": 79.05
+      }
+    },
+    "missing_poster_urls": {
+      "count": 53,
+      "percent": 0.88
+    },
+    "cleaning_report": {
+      "rows_in": 6000,
+      "rows_out": 6000,
+      "invalid_ids_dropped": 0,
+      "duplicate_ids_dropped": 0,
+      "invalid_release_dates": 2,
+      "invalid_years": 2,
+      "invalid_vote_average": 0,
+      "invalid_vote_count": 0,
+      "invalid_popularity": 0,
+      "invalid_runtime": 387,
+      "invalid_poster_urls": 53,
+      "empty_overviews": 281,
+      "empty_titles": 0,
+      "empty_genres": 137,
+      "empty_cast": 190,
+      "empty_directors": 472,
+      "missing_posters": 53
+    },
+    "generated_at_utc": "2026-11-19T08:03:02+00:00"
+  },
+  "libraries": {
+    "python": "3.12.10",
+    "pandas": "2.2.3",
+    "scikit_learn": "1.6.1",
+    "scipy": "1.16.1"
+  },
+  "evaluation_note": "No relevance labels or interaction logs are available. Precision@K, Recall@K and NDCG@K are not measurable; use manual inspection instead.",
+  "visual_features_used": false,
+  "local_poster_files_found": 4958,
+  "artifact_sizes_bytes": {
+    "movie_metadata.json": 9829288,
+    "movie_matrix.npz": 2647671,
+    "movie_id_mapping.json": 213930,
+    "model_info.json": 3045,
+    "tfidf_vectorizer.joblib": 714631,
+    "model_config.json": 656
+  },
+  "total_artifact_bytes": 13409221
+}

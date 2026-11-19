@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOVIE MATE Admin — Content & Streaming Analytics</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter (Sans) & Playfair Display (Serif for 'MATE') -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+          },
+          colors: {
+            brand: {
+              coral: '#FF5A5F',
+              warm: '#FF8A65',
+              peach: '#FFC085',
+              black: '#000000',
+              surface: '#0A0A0A',
+              card: '#141414',
+              cardHover: '#1A1A1A',
+              border: '#222222',
+              muted: '#9E9E9E',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    /* Custom Scrollbar for dark theme */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0A0A0A;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #222222;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF5A5F;
+    }
+
+    /* MOVIE MATE Signature Coral-to-Peach Gradient Utilities */
+    .mm-gradient-bg {
+      background: linear-gradient(135deg, #FF5A5F 0%, #FF8A65 55%, #FFC085 100%);
+    }
+    .mm-gradient-bg-hover:hover {
+      background: linear-gradient(135deg, #ff474d 0%, #ff7a52 55%, #ffb56e 100%);
+    }
+    .mm-gradient-alltime {
+      background: linear-gradient(135deg, #FF5258 0%, #FF7B5C 60%, #FFA06B 100%);
+    }
+    .mm-gradient-today {
+      background: linear-gradient(135deg, #FF8E63 0%, #FFB074 55%, #FFD096 100%);
+    }
+    .mm-gradient-text {
+      background: linear-gradient(90deg, #FF5A5F 0%, #FF8A65 50%, #FFC085 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Subtle Coral-Peach Ambient Glows */
+    .coral-glow {
+      box-shadow: 0 10px 30px -10px rgba(255, 90, 95, 0.42);
+    }
+    .peach-glow {
+      box-shadow: 0 10px 30px -10px rgba(255, 160, 107, 0.35);
+    }
+
+    /* Active sidebar indicator bar */
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(255, 90, 95, 0.18) 0%, rgba(255, 192, 133, 0.03) 100%);
+      color: #ffffff;
+      border-left: 4px solid #FF5A5F;
+    }
+    .nav-item {
+      border-left: 4px solid transparent;
+    }
+
+    /* Underline input aesthetic matching reference dashboard */
+    .underline-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #2A2A2A;
+      transition: border-color 0.2s ease;
+    }
+    .underline-input:focus {
+      outline: none;
+      border-bottom-color: #FF7E67;
+    }
+  </style>
+</head>
+<body class="bg-brand-black text-white font-sans antialiased selection:bg-brand-coral selection:text-white overflow-x-hidden">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-30 hidden lg:hidden"></div>
+
+  <!-- Main Wrapper -->
+  <div class="min-h-screen flex flex-col lg:flex-row bg-brand-surface">
+
+    <!-- ==================== LEFT SIDEBAR ==================== -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#080808] border-r border-brand-border flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+      <div>
+        <!-- Top Brand Logo Header: Exact 'MOVIE MATE' Logo -->
+        <div class="pt-6 pb-5 px-5 flex flex-col items-center border-b border-brand-border/80">
+          <!-- Uploaded Logo Image with Crisp Inline SVG Fallback matching MOVIE MATE exactly -->
+          <div class="w-44 flex flex-col items-center justify-center">
+            <img
+              src="Movie-removebg-preview-2-2.png"
+              alt="MOVIE MATE Logo"
+              class="w-full h-auto object-contain max-h-16"
+              onerror="this.style.display='none'; document.getElementById('movieMateSvgLogo').classList.remove('hidden');"
+            />
+            <!-- Inline SVG Vector Recreation of MOVIE MATE (Bold geometric 'MOVIE' + Serif 'MATE' aligned under 'OV') -->
+            <div id="movieMateSvgLogo" class="hidden w-full select-none">
+              <svg viewBox="0 0 260 92" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="mmLogoGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+                    <stop offset="0%" stop-color="#FF5A5F" />
+                    <stop offset="50%" stop-color="#FF8866" />
+                    <stop offset="100%" stop-color="#FFC78E" />
+                  </linearGradient>
+                  <linearGradient id="mmMateGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+                    <stop offset="0%" stop-color="#FF4F55" />
+                    <stop offset="100%" stop-color="#FFA974" />
+                  </linearGradient>
+                </defs>
+                <!-- Bold Geometric Sans-Serif MOVIE -->
+                <text x="130" y="56" text-anchor="middle" fill="url(#mmLogoGrad)" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="60" letter-spacing="1.5">MOVIE</text>
+                <!-- Refined Serif MATE aligned beneath the 'OV' of MOVIE -->
+                <text x="86" y="84" text-anchor="middle" fill="url(#mmMateGrad)" font-family="'Playfair Display', Georgia, serif" font-weight="500" font-size="25" letter-spacing="1.2">MATE</text>
+              </svg>
+            </div>
+          </div>
+          <span class="mt-2 text-[10px] font-bold tracking-[0.28em] text-brand-muted uppercase">ADMIN CONSOLE</span>
+        </div>
+
+        <!-- Admin Profile Section -->
+        <div class="py-6 px-5 flex flex-col items-center text-center border-b border-brand-border/80">
+          <div class="relative group mb-3">
+            <div class="w-20 h-20 rounded-full mm-gradient-bg p-0.5 coral-glow">
+              <div class="w-full h-full rounded-full bg-[#121212] flex items-center justify-center overflow-hidden">
+                <!-- Stylized Admin Avatar SVG -->
+                <svg class="w-11 h-11 text-brand-warm" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"/>
+                </svg>
+              </div>
+            </div>
+            <span class="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#080808]" title="Online"></span>
+          </div>
+
+          <h2 id="adminNameDisplay" class="text-base font-semibold text-white tracking-wide">Admin User</h2>
+          <p id="adminRoleDisplay" class="text-xs text-brand-muted mt-0.5">Head of Streaming Ops</p>
+
+          <button onclick="openProfileModal()" class="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase text-brand-muted hover:text-brand-peach transition-colors py-1.5 px-3 rounded-lg hover:bg-white/5">
+            <span>EDIT PROFILE</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="mt-4 space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3.5 px-6 py-3.5 text-xs font-semibold tracking-wider uppercase text-brand-muted hover:text-white hover:bg-white/5 transition-all">
+            <svg class="w-5 h-5 text-brand-coral shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>DASHBOARD</span>
+          </button>
+
+          <button onclick="switchTab('catalog')" id="nav-catalog" class="nav-item w-full flex items-center gap-3.5 px-6 py-3.5 text-xs font-semibold tracking-wider uppercase text-brand-muted hover:text-white hover:bg-white/5 transition-all">
+            <svg class="w-5 h-5 text-brand-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+            </svg>
+            <span>MOVIES & SHOWS</span>
+          </button>
+
+          <button onclick="focusPublishForm()" id="nav-add" class="nav-item w-full flex items-center gap-3.5 px-6 py-3.5 text-xs font-semibold tracking-wider uppercase text-brand-muted hover:text-white hover:bg-white/5 transition-all">
+            <svg class="w-5 h-5 text-brand-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>ADD CONTENT</span>
+          </button>
+
+          <button onclick="switchTab('users')" id="nav-users" class="nav-item w-full flex items-center gap-3.5 px-6 py-3.5 text-xs font-semibold tracking-wider uppercase text-brand-muted hover:text-white hover:bg-white/5 transition-all">
+            <svg class="w-5 h-5 text-brand-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>SUBSCRIBERS</span>
+          </button>
+
+          <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-item w-full flex items-center gap-3.5 px-6 py-3.5 text-xs font-semibold tracking-wider uppercase text-brand-muted hover:text-white hover:bg-white/5 transition-all">
+            <svg class="w-5 h-5 text-brand-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span>ANALYTICS</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Live CDN Status Indicator -->
+      <div class="p-4 m-4 rounded-2xl bg-brand-card border border-brand-border">
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="flex items-center gap-1.5 text-brand-muted font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Live CDN Status
+          </span>
+          <span class="mm-gradient-text font-bold">99.99%</span>
+        </div>
+        <div class="w-full h-1.5 bg-black rounded-full overflow-hidden">
+          <div class="mm-gradient-bg h-full rounded-full" style="width: 84%"></div>
+        </div>
+        <p class="text-[11px] text-brand-muted mt-2">4K Dolby Vision Edge Active</p>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- TOP HEADER BAR -->
+      <header class="h-16 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-brand-border px-4 sm:px-8 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3 flex-1 max-w-xl">
+          <!-- Mobile Hamburger -->
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg text-brand-muted hover:text-white hover:bg-white/5">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <!-- Real-Time Search Input -->
+          <div class="relative flex-1 flex items-center">
+            <svg class="w-4 h-4 text-brand-muted absolute left-3.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              id="globalSearchInput"
+              type="text"
+              placeholder="SEARCH TITLES, CATEGORIES, OR LOGLINES..."
+              oninput="handleSearch(this.value)"
+              class="w-full bg-brand-card border border-brand-border focus:border-brand-coral rounded-xl pl-10 pr-4 py-2 text-xs tracking-wider text-white placeholder-brand-muted focus:outline-none transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- Right Action Icons: Subscriber Badge, Notification Dropdown, Sign Out -->
+        <div class="flex items-center gap-3 sm:gap-4 ml-4 relative">
+          <!-- Subscriber Count Pill Badge -->
+          <button onclick="switchTab('users')" title="Active Subscribers" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-brand-card border border-brand-border hover:border-brand-coral/50 text-xs transition-colors">
+            <svg class="w-4 h-4 text-brand-warm" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+            </svg>
+            <span class="font-semibold text-white">165.9M</span>
+          </button>
+
+          <!-- Interactive Notification Dropdown Button -->
+          <div class="relative">
+            <button onclick="toggleNotifications()" id="notifBtn" title="Notifications" class="relative p-2 rounded-xl text-brand-muted hover:text-white hover:bg-white/5 transition-colors">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+              </svg>
+              <!-- Unread coral-peach badge dot -->
+              <span id="notifUnreadDot" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full mm-gradient-bg ring-2 ring-[#0A0A0A]"></span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-brand-card border border-brand-border rounded-2xl shadow-2xl overflow-hidden z-50">
+              <div class="px-4 py-3 border-b border-brand-border flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-white">Notifications</span>
+                <button onclick="markNotificationsRead()" class="text-[11px] font-semibold text-brand-peach hover:underline">Mark all read</button>
+              </div>
+              <div class="divide-y divide-brand-border/70 max-h-64 overflow-y-auto text-xs">
+                <div class="p-3.5 hover:bg-white/[0.03] transition-colors">
+                  <p class="font-semibold text-white"><img src="images-13.jpeg" alt=""></p>
+                  <p class="text-brand-muted mt-0.5">Surpassed 2.0B+ cumulative streams globally.</p>
+                  <span class="text-[10px] text-brand-warm mt-1 block">12 mins ago</span>
+                </div>
+                <div class="p-3.5 hover:bg-white/[0.03] transition-colors">
+                  <p class="font-semibold text-white">4K HDR Encoding Complete</p>
+                  <p class="text-brand-muted mt-0.5">Master package verified for "Animal" Director's Cut.</p>
+                  <span class="text-[10px] text-brand-warm mt-1 block">1 hour ago</span>
+                </div>
+                <div class="p-3.5 hover:bg-white/[0.03] transition-colors">
+                  <p class="font-semibold text-white">Weekend Surge Alert</p>
+                  <p class="text-brand-muted mt-0.5">Concurrent viewers up +18.4% in APAC region.</p>
+                  <span class="text-[10px] text-brand-warm mt-1 block">3 hours ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-5 w-px bg-brand-border hidden sm:block"></div>
+
+          <!-- Sign Out Confirmation Modal Trigger -->
+          <button onclick="openSignOutModal()" class="text-xs font-semibold tracking-widest uppercase text-brand-muted hover:text-brand-coral transition-colors py-1.5 px-2.5 rounded-lg hover:bg-brand-coral/10">
+            SIGNOUT
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================== DASHBOARD VIEW ==================== -->
+      <main id="view-dashboard" class="p-4 sm:p-8 space-y-8 max-w-[1440px] w-full mx-auto">
+
+        <!-- TOP METRICS ROW: Left (Top Performing Titles - 3 Cards) + Right (Total Streams - 2 Stacked Cards) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+
+          <!-- Top Performing Titles (8 cols on XL) -->
+          <section class="xl:col-span-8 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold tracking-tight text-white">Top Performing Titles</h2>
+              <span class="text-xs text-brand-muted">Updated Live • Global Region</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 flex-1">
+              <!-- Featured Card 1: Drishyam: The Conclusion -->
+              <div class="bg-brand-card hover:bg-brand-cardHover border border-brand-border hover:border-brand-coral/50 rounded-2xl p-5 flex flex-col items-center text-center transition-all duration-300 group">
+                <div class="w-24 h-24 rounded-full p-1 mm-gradient-bg mb-4 shadow-lg group-hover:scale-105 transition-transform">
+                  <div class="w-full h-full rounded-full bg-[#091822] flex flex-col items-center justify-center overflow-hidden relative px-2">
+                    <img src="images-13.jpeg" alt="">
+                  </div>
+                </div>
+                <h3 class="text-base font-bold text-white line-clamp-1">Drishyam: The Conclusion</h3>
+                <p class="text-xs text-brand-muted mt-0.5">Crime Thriller • 2026</p>
+                <div class="mt-4 pt-3 border-t border-brand-border w-full">
+                  <p class="text-lg font-extrabold mm-gradient-text">2.04B Streams</p>
+                  <p class="text-[10px] font-semibold tracking-widest uppercase text-brand-muted mt-0.5">IMDb 8.8/10 • #1 FEATURED</p>
+                </div>
+              </div>
+
+              <!-- Featured Card 2: Animal -->
+              <div class="bg-brand-card hover:bg-brand-cardHover border border-brand-border hover:border-brand-coral/50 rounded-2xl p-5 flex flex-col items-center text-center transition-all duration-300 group">
+                <div class="w-24 h-24 rounded-full p-1 mm-gradient-bg mb-4 shadow-lg group-hover:scale-105 transition-transform">
+                  <div class="w-full h-full rounded-full bg-[#1F140D] flex flex-col items-center justify-center overflow-hidden relative px-2">
+                    <img src="781732.jpg" alt="">
+                  </div>
+                </div>
+                <h3 class="text-base font-bold text-white line-clamp-1">Animal</h3>
+                <p class="text-xs text-brand-muted mt-0.5">Action Drama • 2026</p>
+                <div class="mt-4 pt-3 border-t border-brand-border w-full">
+                  <p class="text-lg font-extrabold mm-gradient-text">1.86B Streams</p>
+                  <p class="text-[10px] font-semibold tracking-widest uppercase text-brand-muted mt-0.5">IMDb 8.4/10 • RECOMMENDED</p>
+                </div>
+              </div>
+
+              <!-- Featured Card 3: Varisu -->
+              <div class="bg-brand-card hover:bg-brand-cardHover border border-brand-border hover:border-brand-coral/50 rounded-2xl p-5 flex flex-col items-center text-center transition-all duration-300 group">
+                <div class="w-24 h-24 rounded-full p-1 mm-gradient-bg mb-4 shadow-lg group-hover:scale-105 transition-transform">
+                  <div class="w-full h-full rounded-full bg-[#24140E] flex flex-col items-center justify-center overflow-hidden relative px-2">
+                    <img src="835017.jpg" alt="">
+                  </div>
+                </div>
+                <h3 class="text-base font-bold text-white line-clamp-1">Varisu</h3>
+                <p class="text-xs text-brand-muted mt-0.5">Family Drama • 2026</p>
+                <div class="mt-4 pt-3 border-t border-brand-border w-full">
+                  <p class="text-lg font-extrabold mm-gradient-text">1.52B Streams</p>
+                  <p class="text-[10px] font-semibold tracking-widest uppercase text-brand-muted mt-0.5">IMDb 7.9/10 • TRENDING</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Total Streams Summary Cards (4 cols on XL: 2 Stacked Gradient Cards) -->
+          <section class="xl:col-span-4 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold tracking-tight text-white">Total Streams</h2>
+              <span class="text-xs mm-gradient-text font-semibold">+16.8% this week</span>
+            </div>
+
+            <div class="flex flex-col gap-4 flex-1 justify-between">
+              <!-- Card 1: ALL TIME (Coral-Red to Warm Orange Gradient) -->
+              <div class="relative mm-gradient-alltime rounded-2xl p-6 flex items-center justify-between coral-glow overflow-hidden flex-1">
+                <div>
+                  <span class="text-[11px] font-bold tracking-[0.22em] uppercase text-white/85 block">ALL TIME</span>
+                  <p id="allTimeStreamsDisplay" class="text-2xl sm:text-3xl font-extrabold text-white mt-2 tracking-tight">2.48B Streams</p>
+                </div>
+                <!-- Circular Floating Icon Badge -->
+                <div class="w-12 h-12 rounded-full bg-white text-brand-coral flex items-center justify-center shadow-lg shrink-0">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Card 2: TODAY (Warm Amber-Peach Gradient) -->
+              <div class="relative mm-gradient-today rounded-2xl p-6 flex items-center justify-between peach-glow overflow-hidden flex-1">
+                <div>
+                  <span class="text-[11px] font-bold tracking-[0.22em] uppercase text-black/75 block">TODAY</span>
+                  <p id="todayStreamsDisplay" class="text-2xl sm:text-3xl font-extrabold text-white mt-2 tracking-tight drop-shadow-sm">4.82M Streams</p>
+                </div>
+                <!-- Circular Floating Icon Badge -->
+                <div class="w-12 h-12 rounded-full bg-white text-brand-warm flex items-center justify-center shadow-lg shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- BOTTOM MANAGEMENT ROW: Left (Content Catalog Table) + Right (Publish Title Form) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+          <!-- Content Catalog Table (8 cols on XL) -->
+          <section class="xl:col-span-8">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold tracking-tight text-white">Content Catalog</h2>
+              <span id="catalogCountBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-brand-card border border-brand-border text-brand-peach">
+                6 Active Titles
+              </span>
+            </div>
+
+            <div class="bg-brand-card border border-brand-border rounded-2xl overflow-hidden shadow-xl">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-brand-border text-xs font-semibold text-brand-muted uppercase tracking-wider">
+                      <th class="py-4 px-6">Title</th>
+                      <th class="py-4 px-4">Release Date</th>
+                      <th class="py-4 px-4">Category / Logline</th>
+                      <th class="py-4 px-4">Streams</th>
+                      <th class="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="catalogTableBody" class="divide-y divide-brand-border/80 text-sm">
+                    <!-- Rows rendered dynamically by JS -->
+                  </tbody>
+                </table>
+              </div>
+              <!-- Empty search state -->
+              <div id="emptyCatalogState" class="hidden py-12 px-6 text-center">
+                <p class="text-brand-muted text-sm">No titles match your search filter.</p>
+                <button onclick="resetSearch()" class="mt-3 text-xs font-semibold text-brand-coral hover:underline">Clear Search Filter</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Publish Title Form (4 cols on XL) -->
+          <section class="xl:col-span-4">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold tracking-tight text-white">Publish Title</h2>
+              <span class="text-xs mm-gradient-text font-semibold">Instant Deploy</span>
+            </div>
+
+            <form id="publishTitleForm" onsubmit="handlePublishTitle(event)" class="bg-brand-card border border-brand-border rounded-2xl p-6 shadow-xl space-y-5">
+              <div>
+                <label for="inputTitle" class="sr-only">Title</label>
+                <input
+                  id="inputTitle"
+                  type="text"
+                  required
+                  placeholder="Title (e.g., Narnia: The Silver Chair)"
+                  class="underline-input w-full py-2.5 text-sm text-white placeholder-brand-muted"
+                />
+              </div>
+
+              <div>
+                <label for="inputDate" class="sr-only">Release Date</label>
+                <input
+                  id="inputDate"
+                  type="date"
+                  required
+                  class="underline-input w-full py-2.5 text-sm text-white placeholder-brand-muted [color-scheme:dark]"
+                />
+              </div>
+
+              <div>
+                <label for="inputCategory" class="sr-only">Category / Headline</label>
+                <input
+                  id="inputCategory"
+                  type="text"
+                  required
+                  placeholder="Category / Headline (e.g., Fantasy Adventure • 4K HDR)"
+                  class="underline-input w-full py-2.5 text-sm text-white placeholder-brand-muted"
+                />
+              </div>
+
+              <div>
+                <label for="inputSynopsis" class="sr-only">Synopsis</label>
+                <textarea
+                  id="inputSynopsis"
+                  rows="3"
+                  placeholder="Enter synopsis, cast highlights, or regional premiere notes..."
+                  class="w-full bg-black/60 border border-brand-border focus:border-brand-coral rounded-xl p-3.5 text-xs text-white placeholder-brand-muted focus:outline-none transition-colors resize-none"
+                ></textarea>
+              </div>
+
+              <div class="pt-1 flex justify-end">
+                <button
+                  type="submit"
+                  class="mm-gradient-bg mm-gradient-bg-hover active:scale-95 text-white text-xs font-bold tracking-widest uppercase px-7 py-3 rounded-full coral-glow transition-all cursor-pointer shadow-lg"
+                >
+                  PUBLISH TITLE
+                </button>
+              </div>
+            </form>
+          </section>
+
+        </div>
+      </main>
+
+      <!-- ==================== ANALYTICS VIEW ==================== -->
+      <section id="view-analytics" class="hidden p-4 sm:p-8 space-y-6 max-w-[1440px] w-full mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white">MOVIE MATE Bandwidth & Viewer Analytics</h2>
+            <p class="text-xs text-brand-muted mt-1">Real-time concurrent streams across 4K Ultra HD, Full HD, and Mobile tiers</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-brand-card border border-brand-border hover:border-brand-coral text-xs font-semibold text-white transition-colors">
+            ← Back to Overview
+          </button>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-muted">7-Day Concurrent Stream Volume (Millions)</h3>
+            <span class="text-xs font-semibold mm-gradient-text">Peak: 6.8M Concurrent</span>
+          </div>
+          <div class="w-full h-64">
+            <canvas id="analyticsCanvas" class="w-full h-full"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SUBSCRIBERS VIEW ==================== -->
+      <section id="view-users" class="hidden p-4 sm:p-8 space-y-6 max-w-[1440px] w-full mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white">Active Subscriber Tiers</h2>
+            <p class="text-xs text-brand-muted mt-1">Global membership distribution across MOVIE MATE plans</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-brand-card border border-brand-border hover:border-brand-coral text-xs font-semibold text-white transition-colors">
+            ← Back to Overview
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Mobile Plan</span>
+            <p class="text-3xl font-extrabold text-white mt-2">42.8M</p>
+            <p class="text-xs text-emerald-400 mt-2">+5.4% this month</p>
+          </div>
+          <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-muted">Standard 1080p</span>
+            <p class="text-3xl font-extrabold text-white mt-2">68.2M</p>
+            <p class="text-xs text-emerald-400 mt-2">+8.1% this month</p>
+          </div>
+          <div class="bg-brand-card border border-brand-coral/60 rounded-2xl p-6 coral-glow">
+            <span class="text-xs font-bold uppercase tracking-wider mm-gradient-text">Premium 4K + HDR</span>
+            <p class="text-3xl font-extrabold text-white mt-2">54.9M</p>
+            <p class="text-xs text-emerald-400 mt-2">+12.7% this month</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ==================== EDIT TITLE MODAL ==================== -->
+  <div id="editModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-white">Edit Streaming Title</h3>
+        <button onclick="closeEditModal()" class="text-brand-muted hover:text-white">✕</button>
+      </div>
+      <form id="editTitleForm" onsubmit="saveEditedTitle(event)" class="space-y-4">
+        <input type="hidden" id="editRowId" />
+        <div>
+          <label class="block text-xs font-semibold text-brand-muted uppercase mb-1">Title Name</label>
+          <input id="editTitleInput" type="text" required class="w-full bg-black border border-brand-border focus:border-brand-coral rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-brand-muted uppercase mb-1">Release Date</label>
+          <input id="editDateInput" type="text" required class="w-full bg-black border border-brand-border focus:border-brand-coral rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-brand-muted uppercase mb-1">Category / Logline</label>
+          <input id="editCategoryInput" type="text" required class="w-full bg-black border border-brand-border focus:border-brand-coral rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-brand-muted uppercase mb-1">Streams Count</label>
+          <input id="editStreamsInput" type="text" required class="w-full bg-black border border-brand-border focus:border-brand-coral rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+        <div class="pt-2 flex justify-end gap-3">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-brand-muted hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-full mm-gradient-bg mm-gradient-bg-hover text-xs font-bold uppercase tracking-wider text-white coral-glow">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== EDIT PROFILE MODAL ==================== -->
+  <div id="profileModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-white">Edit Admin Profile</h3>
+        <button onclick="closeProfileModal()" class="text-brand-muted hover:text-white">✕</button>
+      </div>
+      <form onsubmit="saveProfile(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-brand-muted uppercase mb-1">Admin Name</label>
+          <input id="profileNameInput" type="text" value="Admin User" required class="w-full bg-black border border-brand-border focus:border-brand-coral rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-brand-muted uppercase mb-1">Role Title</label>
+          <input id="profileRoleInput" type="text" value="Head of Streaming Ops" required class="w-full bg-black border border-brand-border focus:border-brand-coral rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+        <div class="pt-2 flex justify-end gap-3">
+          <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-brand-muted hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-full mm-gradient-bg mm-gradient-bg-hover text-xs font-bold uppercase tracking-wider text-white coral-glow">Update Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== SIGN OUT CONFIRMATION MODAL ==================== -->
+  <div id="signOutModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
+      <div class="w-12 h-12 rounded-full mm-gradient-bg mx-auto mb-4 flex items-center justify-center text-white coral-glow">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-white">Sign Out of MOVIE MATE?</h3>
+      <p class="text-xs text-brand-muted mt-1.5">You will need to re-authenticate via SSO to access the content catalog.</p>
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button onclick="closeSignOutModal()" class="px-4 py-2 rounded-xl border border-brand-border text-xs font-semibold text-brand-muted hover:text-white">Stay Signed In</button>
+        <button onclick="confirmSignOut()" class="px-5 py-2 rounded-full mm-gradient-bg mm-gradient-bg-hover text-xs font-bold uppercase tracking-wider text-white coral-glow">Confirm Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION ==================== -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-[#161616] border border-brand-coral/70 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 coral-glow">
+      <span class="w-2.5 h-2.5 rounded-full mm-gradient-bg animate-pulse"></span>
+      <span id="toastMessage" class="text-xs font-semibold tracking-wide">Action completed</span>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // Initial Content Catalog Data
+    let catalogItems = [
+      { id: 1, title: 'DRISHYAM: THE CONCLUSION', date: '18/11/2026', category: 'Crime Thriller • IMDb 8.8/10', streams: '2.04B' },
+      { id: 2, title: 'ANIMAL', date: '14/11/2026', category: 'Action Drama • Recommended', streams: '1.86B' },
+      { id: 3, title: 'VARISU', date: '10/11/2026', category: 'Family Blockbuster • Trending', streams: '1.52B' },
+      { id: 4, title: 'LANDFILL', date: '05/11/2026', category: 'Mystery Horror • 4K Ultra HD', streams: '840M' },
+      { id: 5, title: 'KHO GAYE HUM KAHAN', date: '01/11/2026', category: 'Coming-of-Age Drama • Top Pick', streams: '790M' },
+      { id: 6, title: 'NATTY KNOCKS', date: '28/10/2026', category: 'Supernatural Slasher • Midnight', streams: '615M' }
+    ];
+
+    let allTimeBillions = 2.48;
+    let todayMillions = 4.82;
+    let currentSearchQuery = '';
+
+    // Set default date in Publish Title form to today
+    function setDefaultPublishDate() {
+      const dateInput = document.getElementById('inputDate');
+      if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+      }
+    }
+
+    // Render Content Catalog Table
+    function renderCatalog() {
+      const tbody = document.getElementById('catalogTableBody');
+      const emptyState = document.getElementById('emptyCatalogState');
+      const countBadge = document.getElementById('catalogCountBadge');
+
+      const filtered = catalogItems.filter(item =>
+        item.title.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+        item.date.toLowerCase().includes(currentSearchQuery.toLowerCase())
+      );
+
+      countBadge.textContent = `${filtered.length} Active Title${filtered.length === 1 ? '' : 's'}`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      tbody.innerHTML = filtered.map(item => `
+        <tr class="hover:bg-white/[0.03] transition-colors group">
+          <td class="py-4 px-6 font-semibold text-white tracking-wide">${escapeHTML(item.title)}</td>
+          <td class="py-4 px-4 text-brand-muted text-xs">${escapeHTML(item.date)}</td>
+          <td class="py-4 px-4 text-gray-300 text-xs">${escapeHTML(item.category)}</td>
+          <td class="py-4 px-4">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-coral/15 text-brand-peach border border-brand-coral/30">
+              ${escapeHTML(item.streams)}
+            </span>
+          </td>
+          <td class="py-4 px-6 text-right">
+            <div class="inline-flex items-center gap-2">
+              <button onclick="openEditModal(${item.id})" title="Edit Title" class="p-1.5 rounded-lg text-brand-muted hover:text-brand-peach hover:bg-white/10 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              </button>
+              <button onclick="deleteCatalogItem(${item.id})" title="Delete Title" class="p-1.5 rounded-lg text-brand-muted hover:text-brand-coral hover:bg-brand-coral/10 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Search Filter
+    function handleSearch(query) {
+      currentSearchQuery = query.trim();
+      renderCatalog();
+    }
+
+    function resetSearch() {
+      document.getElementById('globalSearchInput').value = '';
+      currentSearchQuery = '';
+      renderCatalog();
+    }
+
+    // Publish Title Form Submission
+    function handlePublishTitle(event) {
+      event.preventDefault();
+      const titleInput = document.getElementById('inputTitle');
+      const dateInput = document.getElementById('inputDate');
+      const categoryInput = document.getElementById('inputCategory');
+      const synopsisInput = document.getElementById('inputSynopsis');
+
+      const rawTitle = titleInput.value.trim().toUpperCase();
+      const rawCategory = categoryInput.value.trim();
+
+      if (!rawTitle || !rawCategory) return;
+
+      // Format YYYY-MM-DD to DD/MM/YYYY
+      let formattedDate = '19/11/2026';
+      if (dateInput.value) {
+        const [y, m, d] = dateInput.value.split('-');
+        formattedDate = `${d}/${m}/${y}`;
+      }
+
+      const newEntry = {
+        id: Date.now(),
+        title: rawTitle,
+        date: formattedDate,
+        category: rawCategory,
+        streams: '1.20M'
+      };
+
+      catalogItems.unshift(newEntry);
+
+      // Increment Total Streams Metric Counters
+      todayMillions = +(todayMillions + 0.14).toFixed(2);
+      allTimeBillions = +(allTimeBillions + 0.01).toFixed(2);
+      document.getElementById('todayStreamsDisplay').textContent = `${todayMillions.toFixed(2)}M Streams`;
+      document.getElementById('allTimeStreamsDisplay').textContent = `${allTimeBillions.toFixed(2)}B Streams`;
+
+      titleInput.value = '';
+      categoryInput.value = '';
+      synopsisInput.value = '';
+      setDefaultPublishDate();
+
+      renderCatalog();
+      showToast(`"${rawTitle}" published to MOVIE MATE!`);
+    }
+
+    // Delete Title
+    function deleteCatalogItem(id) {
+      const target = catalogItems.find(item => item.id === id);
+      catalogItems = catalogItems.filter(item => item.id !== id);
+      renderCatalog();
+      if (target) {
+        showToast(`Removed "${target.title}" from catalog`);
+      }
+    }
+
+    // Edit Modal Functions
+    function openEditModal(id) {
+      const item = catalogItems.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('editRowId').value = item.id;
+      document.getElementById('editTitleInput').value = item.title;
+      document.getElementById('editDateInput').value = item.date;
+      document.getElementById('editCategoryInput').value = item.category;
+      document.getElementById('editStreamsInput').value = item.streams;
+
+      const modal = document.getElementById('editModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById('editModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveEditedTitle(event) {
+      event.preventDefault();
+      const id = Number(document.getElementById('editRowId').value);
+      const index = catalogItems.findIndex(i => i.id === id);
+      if (index === -1) return;
+
+      catalogItems[index] = {
+        ...catalogItems[index],
+        title: document.getElementById('editTitleInput').value.trim().toUpperCase(),
+        date: document.getElementById('editDateInput').value.trim(),
+        category: document.getElementById('editCategoryInput').value.trim(),
+        streams: document.getElementById('editStreamsInput').value.trim()
+      };
+
+      closeEditModal();
+      renderCatalog();
+      showToast('Title metadata updated');
+    }
+
+    // Profile Modal Functions
+    function openProfileModal() {
+      const modal = document.getElementById('profileModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeProfileModal() {
+      const modal = document.getElementById('profileModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveProfile(event) {
+      event.preventDefault();
+      const newName = document.getElementById('profileNameInput').value.trim();
+      const newRole = document.getElementById('profileRoleInput').value.trim();
+      if (newName) {
+        document.getElementById('adminNameDisplay').textContent = newName;
+        if (newRole) document.getElementById('adminRoleDisplay').textContent = newRole;
+        closeProfileModal();
+        showToast('Admin profile updated');
+      }
+    }
+
+    // Notification Dropdown Logic
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notifDropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
+    function markNotificationsRead() {
+      document.getElementById('notifUnreadDot').classList.add('hidden');
+      document.getElementById('notifDropdown').classList.add('hidden');
+      showToast('All notifications marked as read');
+    }
+
+    // Close notification dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+      const dropdown = document.getElementById('notifDropdown');
+      const btn = document.getElementById('notifBtn');
+      if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Sign Out Confirmation Modal Logic
+    function openSignOutModal() {
+      const modal = document.getElementById('signOutModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSignOutModal() {
+      const modal = document.getElementById('signOutModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmSignOut() {
+      closeSignOutModal();
+      showToast('Signed out of MOVIE MATE Admin Console');
+    }
+
+    // Navigation & View Switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active');
+        const svg = btn.querySelector('svg');
+        if (svg) svg.classList.replace('text-brand-coral', 'text-brand-muted');
+      });
+
+      const activeBtn = document.getElementById(`nav-${tabName}`) || document.getElementById('nav-dashboard');
+      activeBtn.classList.add('active');
+      const activeSvg = activeBtn.querySelector('svg');
+      if (activeSvg) activeSvg.classList.replace('text-brand-muted', 'text-brand-coral');
+
+      const dashboardView = document.getElementById('view-dashboard');
+      const analyticsView = document.getElementById('view-analytics');
+      const usersView = document.getElementById('view-users');
+
+      dashboardView.classList.add('hidden');
+      analyticsView.classList.add('hidden');
+      usersView.classList.add('hidden');
+
+      if (tabName === 'analytics') {
+        analyticsView.classList.remove('hidden');
+        drawAnalyticsChart();
+      } else if (tabName === 'users') {
+        usersView.classList.remove('hidden');
+      } else {
+        dashboardView.classList.remove('hidden');
+        if (tabName === 'catalog') {
+          document.getElementById('catalogTableBody').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
+        toggleMobileSidebar();
+      }
+    }
+
+    function focusPublishForm() {
+      switchTab('dashboard');
+      const input = document.getElementById('inputTitle');
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => input.focus(), 250);
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    }
+
+    // Responsive Canvas Chart for Analytics Tab
+    function drawAnalyticsChart() {
+      const canvas = document.getElementById('analyticsCanvas');
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const width = rect.width;
+      const height = rect.height;
+      const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const values = [4.2, 4.7, 4.5, 5.4, 6.2, 6.8, 6.5];
+      const maxVal = 7.5;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const padLeft = 40;
+      const padRight = 20;
+      const padTop = 20;
+      const padBottom = 35;
+      const chartW = width - padLeft - padRight;
+      const chartH = height - padTop - padBottom;
+
+      ctx.strokeStyle = '#222222';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padTop + (chartH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(width - padRight, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#9E9E9E';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(`${(maxVal - (maxVal / 4) * i).toFixed(1)}M`, 4, y + 4);
+      }
+
+      const points = values.map((val, idx) => ({
+        x: padLeft + (chartW / (values.length - 1)) * idx,
+        y: padTop + chartH - (val / maxVal) * chartH
+      }));
+
+      // Coral-Peach Area Fill
+      const grad = ctx.createLinearGradient(0, padTop, 0, padTop + chartH);
+      grad.addColorStop(0, 'rgba(255, 90, 95, 0.35)');
+      grad.addColorStop(1, 'rgba(255, 192, 133, 0.0)');
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, padTop + chartH);
+      points.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.lineTo(points[points.length - 1].x, padTop + chartH);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Coral-Peach Line Stroke
+      const strokeGrad = ctx.createLinearGradient(padLeft, 0, width - padRight, 0);
+      strokeGrad.addColorStop(0, '#FF5A5F');
+      strokeGrad.addColorStop(0.5, '#FF8A65');
+      strokeGrad.addColorStop(1, '#FFC085');
+
+      ctx.beginPath();
+      points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+      ctx.strokeStyle = strokeGrad;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      points.forEach((p, idx) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.strokeStyle = '#FF5A5F';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.fillStyle = '#9E9E9E';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[idx], p.x, height - 10);
+      });
+    }
+
+    // Toast Helper
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toastNotification');
+      const msgEl = document.getElementById('toastMessage');
+      msgEl.textContent = message;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3200);
+    }
+
+    // XSS Safe Helper
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, match => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[match]));
+    }
+
+    window.addEventListener('resize', () => {
+      if (!document.getElementById('view-analytics').classList.contains('hidden')) {
+        drawAnalyticsChart();
+      }
+    });
+
+    window.onload = function () {
+      setDefaultPublishDate();
+      renderCatalog();
+    };
+  </script>
+</body>
+</html>

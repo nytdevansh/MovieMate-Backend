@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: moviemate
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    autoDeployTrigger: commit
+    repo: https://github.com/nytdevansh/MovieMate-Backend.git
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 wsgi:app
+    healthCheckPath: /api/health
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATASET_PATH
+        value: data/all_titles.csv
+      - key: MODEL_DIR
+        value: model
+      - key: POSTER_DIRS
+        value: assets/posters
+      - key: WATCH_REGION
+        value: IN
+      - key: ALLOW_REMOTE_POSTERS
+        value: "true"
+      - key: MEDIA_CACHE_MAX_AGE
+        value: "3600"
+      - key: CORS_ALLOWED_ORIGIN
+        value: "*"
+      - key: TMDB_BEARER_TOKEN
+        sync: false
