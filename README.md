@@ -496,7 +496,7 @@ See [`docs/PRODUCTION.md`](docs/PRODUCTION.md) for a deployment checklist.
 ## Verification results (real, from this repository)
 
 - Local training on 6,000 titles (5,000 movies + 1,000 TV series): **3.2 s**, vocabulary **62,219**, sparse matrix **6,000 × 373,314**, **509,569** non-zero values, artifact bundle **~13.4 MB**.
-- `python -m pytest`: **41 passed**.
+- `python -m pytest`: **46 passed**.
 - Live Flask smoke checks: every remaining page (`/`, `/index.html`, `/adminlogin.html`, `/admin.html`, `/streaming_platform_admin_dashboard.html`, `/dashboard.html`, `/title/<id>`), protected Frontend images/CSS/JS, `/media/posters/tv-<id>.jpg`, `/media/fallback/poster.svg`, all REST endpoints (200), invalid parameters (400), unknown IDs (404), removed `/app` (404), and `/.env` (404).
 - Browser check: preserved dashboard cards stay intact while API-backed sections load; clicking any card opens the keyboard-accessible detail overlay with real streaming providers, cinema-search links and personalised model recommendations. Repeating a request lowers previously shown titles, and the × action, opens and My List changes feed the session bandit. The sign-in pages gain labels, larger targets and skip links through `ui-polish.js` without editing their files. TV detail pages correctly say cinema showtimes are not applicable, and a `<base href="/">` injection keeps all original relative images working from `/title/<id>`. Frontend assets use `Cache-Control: no-cache, max-age=0` so deployments are visible immediately, while `/media/*` uses `public, max-age=3600`.
 - Manual inspection examples and missing-data percentages: [`reports/generated/evaluation_report.md`](reports/generated/evaluation_report.md).
